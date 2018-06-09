@@ -17,7 +17,7 @@ const test_data = struct {
 };
 
 fn sum_tests() [14]test_data {
-    var x = []test_data{
+    return []test_data{
         test_data.init(0xef46db3751d8e999, ""),
         test_data.init(0xd24ec4f1a98c6e5b, "a"),
         test_data.init(0x65f708ca92d04a61, "ab"),
@@ -33,18 +33,17 @@ fn sum_tests() [14]test_data {
         test_data.init(0x64f23ecf1609b766, "abcdefghijklmnopqrstuvwxyz0123456789"),
         test_data.init(0xc5a8b11443765630, "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."),
     };
-    return x;
-
 }
 
 
 test "xxhash.64.basic" {
     var data = sum_tests();
 
-    for (data) |d| {
+    for (data) |d, i| {
         var xx = xxhash.init(0);
-        const bytes_written = xx.write(d.input);
-
+        _ = xx.write(d.input);
+        
         assert(xx.sum() == d.sum);
+        assert(xx.checksum(d.input, 0) == d.sum);
     }
 }

@@ -58,23 +58,23 @@ pub const xxhash = struct {
             h64 = self.seed +% prime_5 +% self.total_len;
         }
         
-        var p: i64 = 0;
+        var p: usize = 0;
         var n = self.buf_used;
         
-        while (p <= n - 8): (p += 8) {
-            h64 ^= rol31(uint64(self.buf[usize(p)..usize(p+8)]) *% prime_2) *% prime_1;
+        while (i64(p) <= n - 8): (p += 8) {
+            h64 ^= rol31(uint64(self.buf[p..p+8]) *% prime_2) *% prime_1;
             h64 = rol27(h64) *% prime_1 +% prime_4;
         }
         
-        if (p+4 <= n) {
-            var sub = self.buf[usize(p)..usize(p+4)];
+        if (i64(p+4) <= n) {
+            var sub = self.buf[p..p+4];
             h64 ^= u64(uint32(sub)) *% prime_1;
             h64 = rol23(h64) *% prime_2 +% prime_3;
             p += 4; 
         }
         
-        while (p < n): (p += 1) {
-            h64 ^= u64(self.buf[usize(p)]) *% prime_5;
+        while (i64(p) < n): (p += 1) {
+            h64 ^= u64(self.buf[p]) *% prime_5;
             h64 = rol11(h64) *% prime_1;
         }
         
@@ -101,9 +101,8 @@ pub const xxhash = struct {
             self.buf_used += i64(input.len);
             return n;
         }
-        var p: u64 = 0;
 
-
+        var p: usize = 0;
         if (m > 0) {
             mem.copy(u8, self.buf[usize(self.buf_used)..], input[0..r]);
             self.buf_used += i64(input.len - r);
@@ -117,7 +116,6 @@ pub const xxhash = struct {
             self.buf_used = 0;
         } 
 
-
         while (p <= n-32): (p += 32) {
             var sub = input[p..];
             
@@ -127,16 +125,80 @@ pub const xxhash = struct {
             self.v4 = rol31(self.v4 +% uint64(sub[24..]) *% prime_2) *% prime_1;
         }
 
-
         mem.copy(u8, self.buf[usize(self.buf_used)..], input[p..]);
-
         self.buf_used += i64(input.len - p);
         
         return n;
     }
 
     pub fn checksum(self: *xxhash, input: []const u8, seed: u64) u64 {
+        var n = input.len;
+        var h64: u64 = 0;
+
+        var input2: []const u8 = undefined;
+        if (n >= 32) {
+            var v1 = seed +% prime_1 +% prime_2;
+            var v2 = seed +% prime_2;
+            var v3 = seed;
+            var v4 = seed -% prime_1;
+
+            var p: u64 = 0;
+            while (p <= n-32): (p += 32) {
+                var sub = input[p..];
+            
+                v1 = rol31(v1 +% uint64(sub[0..])  *% prime_2) *% prime_1;
+                v2 = rol31(v2 +% uint64(sub[8..])  *% prime_2) *% prime_1;
+                v3 = rol31(v3 +% uint64(sub[16..]) *% prime_2) *% prime_1;
+                v4 = rol31(v4 +% uint64(sub[24..]) *% prime_2) *% prime_1;
+            }
+
+            h64 = rol1(v1) +% rol7(v2) +% rol12(v3) +% rol18(v4);
+
+            v1 *%= prime_2;
+            v2 *%= prime_2;
+            v3 *%= prime_2;
+            v4 *%= prime_2;
+
+            h64 = (h64^(rol31(v1) *% prime_1)) *% prime_1 +% prime_4;
+            h64 = (h64^(rol31(v2) *% prime_1)) *% prime_1 +% prime_4;
+            h64 = (h64^(rol31(v3) *% prime_1)) *% prime_1 +% prime_4;
+            h64 = (h64^(rol31(v4) *% prime_1)) *% prime_1 +% prime_4;
+
+            h64 +%= n;
+
+            input2 = input[p..];
+            n -= p;
+        } else {
+            h64 = seed +% prime_5 +% n; 
+            input2 = input[0..];
+        }
         
+        var p: usize = 0;   
+        while (i64(p) <= i64(n) - 8): (p += 8) {
+            
+            var sub = input2[p..p+8];
+            h64 ^= rol31(uint64(sub) *% prime_2) *% prime_1;
+            h64 = rol27(h64) *% prime_1 +% prime_4;
+        }
+
+        if (p+4 <= n) {
+            var sub = input2[p..p+4];
+            h64 ^= u64(uint32(sub)) *% prime_1;
+            h64 = rol23(h64) *% prime_2 +% prime_3;
+            p += 4; 
+        }
+
+        while (p < n): (p += 1) {
+            h64 ^= u64(input2[p]) *% prime_5;
+            h64 = rol11(h64) *% prime_1;
+        }
+
+        h64 ^= h64 >> 33;
+        h64 *%= prime_2;
+        h64 ^= h64 >> 29;
+        h64 *%= prime_3;
+        h64 ^= h64 >> 32;
+        return h64;
     }
 };
 
