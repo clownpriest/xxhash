@@ -21,7 +21,7 @@ func bench(payload []byte) float64 {
 	t := time.Now()
 	secs := t.Sub(start).Seconds()
 	fmt.Println(results[0])
-	mbps := float64(len(payload)*iteration_count/1000000) / secs
+	mbps := float64((len(payload)*iteration_count)/1000000) / secs
 	return mbps
 }
 
