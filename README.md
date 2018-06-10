@@ -11,9 +11,9 @@ all benchmarks run on Broadwell Intel Core i7 3.1Ghz:
 
 | load size | zig           | go (cespare)  |
 | --------- | ------------- | ------------- |
-| 8B        | 1219.90 MB/s  | 341.47 MB/s   |
-| 64B       | 3362.59 MB/s  | 2495.76 MB/s  |
-| 128B      | 5659.05 MB/s  | 4173.74 MB/s  |
-| 4K        | 12485.72 MB/s | 11993.22 MB/s |  |
+| 8B        | 1915.17 MB/s  | 353.81 MB/s   |
+| 64B       | 3929.87 MB/s  | 2551.29 MB/s  |
+| 128B      | 6199.02 MB/s  | 4292.74 MB/s  |
+| 4K        | 12403.13 MB/s | 12126.35 MB/s |  |
 
 benchmark code is in the test folder

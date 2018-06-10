@@ -13,11 +13,11 @@ fn bench(payload: []const u8) !f64 {
     var xx = xxhash.init(0);
     var i: usize = 0;
 
-    var timer = try Timer.start();
-    const start = timer.lap();
-
     const iteration_count: usize = 1000000;
     var results: [iteration_count]u64 = undefined;
+
+    var timer = try Timer.start();
+    const start = timer.lap();
 
     while (i < iteration_count): (i += 1) {
         results[i] = xx.checksum(payload, 0);
