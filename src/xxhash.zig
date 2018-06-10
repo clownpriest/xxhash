@@ -146,23 +146,23 @@ pub const xxhash = struct {
             while (p <= n-32): (p += 32) {
                 var sub = input[p..];
             
-                v1 = rol31(v1 +% uint64(sub[0..])  *% prime_2) *% prime_1;
-                v2 = rol31(v2 +% uint64(sub[8..])  *% prime_2) *% prime_1;
-                v3 = rol31(v3 +% uint64(sub[16..]) *% prime_2) *% prime_1;
-                v4 = rol31(v4 +% uint64(sub[24..]) *% prime_2) *% prime_1;
+                v1 = rol31(v1 +% @inlineCall(uint64, sub[0..])  *% prime_2) *% prime_1;
+                v2 = rol31(v2 +% @inlineCall(uint64, sub[8..])  *% prime_2) *% prime_1;
+                v3 = rol31(v3 +% @inlineCall(uint64, sub[16..]) *% prime_2) *% prime_1;
+                v4 = rol31(v4 +% @inlineCall(uint64, sub[24..]) *% prime_2) *% prime_1;
             }
 
-            h64 = rol1(v1) +% rol7(v2) +% rol12(v3) +% rol18(v4);
+            h64 = @inlineCall(rol1, v1) +% @inlineCall(rol7, v2) +% @inlineCall(rol12, v3) +% @inlineCall(rol18, v4);
 
             v1 *%= prime_2;
             v2 *%= prime_2;
             v3 *%= prime_2;
             v4 *%= prime_2;
 
-            h64 = (h64^(rol31(v1) *% prime_1)) *% prime_1 +% prime_4;
-            h64 = (h64^(rol31(v2) *% prime_1)) *% prime_1 +% prime_4;
-            h64 = (h64^(rol31(v3) *% prime_1)) *% prime_1 +% prime_4;
-            h64 = (h64^(rol31(v4) *% prime_1)) *% prime_1 +% prime_4;
+            h64 = (h64^(@inlineCall(rol31, v1) *% prime_1)) *% prime_1 +% prime_4;
+            h64 = (h64^(@inlineCall(rol31, v2) *% prime_1)) *% prime_1 +% prime_4;
+            h64 = (h64^(@inlineCall(rol31, v3) *% prime_1)) *% prime_1 +% prime_4;
+            h64 = (h64^(@inlineCall(rol31, v4) *% prime_1)) *% prime_1 +% prime_4;
 
             h64 +%= n;
 
@@ -177,20 +177,20 @@ pub const xxhash = struct {
         while (i64(p) <= i64(n) - 8): (p += 8) {
             
             var sub = input2[p..p+8];
-            h64 ^= rol31(uint64(sub) *% prime_2) *% prime_1;
-            h64 = rol27(h64) *% prime_1 +% prime_4;
+            h64 ^= rol31(@inlineCall(uint64, sub) *% prime_2) *% prime_1;
+            h64 = @inlineCall(rol27, h64) *% prime_1 +% prime_4;
         }
 
         if (p+4 <= n) {
             var sub = input2[p..p+4];
-            h64 ^= u64(uint32(sub)) *% prime_1;
-            h64 = rol23(h64) *% prime_2 +% prime_3;
+            h64 ^= u64(@inlineCall(uint32, sub)) *% prime_1;
+            h64 = @inlineCall(rol23, h64) *% prime_2 +% prime_3;
             p += 4; 
         }
 
         while (p < n): (p += 1) {
             h64 ^= u64(input2[p]) *% prime_5;
-            h64 = rol11(h64) *% prime_1;
+            h64 = @inlineCall(rol11, h64) *% prime_1;
         }
 
         h64 ^= h64 >> 33;
