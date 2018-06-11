@@ -10,9 +10,11 @@ $ zig run --release-fast bench.zig
 ### c
 
 ```
-$ clang bench.c -O3 -lxxhash -o cbench
+$ git clone https://github.com/Cyan4973/xxHash.git
+$ clang -flto -O3 xxHash/xxhash.c bench.c -o cbench
 $ ./cbench
 ```
+
 ### go
 
 ```

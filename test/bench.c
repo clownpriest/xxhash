@@ -1,16 +1,16 @@
+#include "./xxHash/xxhash.h"
 #include "stdint.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
 #include "time.h"
-#include "xxhash.h"
 
 static double ts_to_secs(struct timespec* ts) {
   return (double)ts->tv_sec + (double)ts->tv_nsec / 1000000000.0;
 }
 
-double bench(void* buffer, int len) {
-  int iteration_count = 1000000;
+double bench(void* buffer, size_t len) {
+  size_t iteration_count = 1000000;
   uint64_t results[iteration_count];
 
   struct timespec start;
@@ -23,7 +23,7 @@ double bench(void* buffer, int len) {
   clock_gettime(CLOCK_MONOTONIC, &end);
 
   float secs = ts_to_secs(&end) - ts_to_secs(&start);
-
+  // printf("\n%f\n", secs);
   printf("%llx\n", results[0]);
 
   double mbps = ((len * iteration_count) / 1000000) / secs;
