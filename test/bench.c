@@ -23,7 +23,6 @@ double bench(void* buffer, size_t len) {
   clock_gettime(CLOCK_MONOTONIC, &end);
 
   float secs = ts_to_secs(&end) - ts_to_secs(&start);
-  // printf("\n%f\n", secs);
   printf("%llx\n", results[0]);
 
   double mbps = ((len * iteration_count) / 1000000) / secs;
